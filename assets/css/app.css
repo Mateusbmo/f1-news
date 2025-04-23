@@ -2,4 +2,33 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* This file is for your main application CSS */
+/* Custom styles for carousel */
+.carousel {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  @apply text-white bg-blue-600 rounded-full w-12 h-12 flex items-center justify-center opacity-75 hover:opacity-100 transition-opacity;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  @apply text-base font-bold;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-500 text-white font-semibold py-2 px-4 rounded hover:bg-gray-600 transition-colors;
+}
+
+/* Ensure images don't overflow */
+.card img {
+  @apply w-full object-cover;
+}

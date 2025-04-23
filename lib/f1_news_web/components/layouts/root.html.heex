@@ -4,14 +4,45 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="F1News" suffix=" · Phoenix Framework">
-      {assigns[:page_title]}
+    <.live_title suffix=" · Phoenix Framework">
+      <%= assigns[:page_title] || "F1News" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
-    </script>
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}></script>
   </head>
-  <body class="bg-white">
-    {@inner_content}
+  <body class="bg-white antialiased">
+    <ul class="flex items-center gap-4 px-4 sm:px-6 lg:px-8 py-4 text-sm font-medium text-gray-900">
+      <li>
+        <a href={~p"/"} class="hover:underline">Home</a>
+      </li>
+      <li>
+        <a href={~p"/news"} class="hover:underline">News</a>
+      </li>
+      <li>
+        <a href={~p"/standings"} class="hover:underline">Standings</a>
+      </li>
+      <li>
+        <a href={~p"/schedule"} class="hover:underline">Schedule</a>
+      </li>
+      <li>
+        <a href={~p"/results"} class="hover:underline">Results</a>
+      </li>
+      <%= if @current_user do %>
+        <li>
+          <a href={~p"/users/settings"} class="hover:underline">Settings</a>
+        </li>
+        <li>
+          <a href={~p"/users/log_out"} method="delete" class="hover:underline">Log out</a>
+        </li>
+      <% else %>
+        <li>
+          <a href={~p"/users/register"} class="hover:underline">Register</a>
+        </li>
+        <li>
+          <a href={~p"/users/log_in"} class="hover:underline">Log in</a>
+        </li>
+      <% end %>
+    </ul>
+    <%= @inner_content %>
   </body>
 </html>

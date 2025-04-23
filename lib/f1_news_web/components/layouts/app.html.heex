@@ -1,32 +1,65 @@
-<header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-    <div class="flex items-center gap-4">
-      <a href="/">
-        <img src={~p"/images/logo.svg"} width="36" />
-      </a>
-      <p class="bg-brand/5 text-brand rounded-full px-2 font-medium leading-6">
-        v{Application.spec(:phoenix, :vsn)}
-      </p>
-    </div>
-    <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
-      <a href="https://twitter.com/elixirphoenix" class="hover:text-zinc-700">
-        @elixirphoenix
-      </a>
-      <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
-        GitHub
-      </a>
-      <a
-        href="https://hexdocs.pm/phoenix/overview.html"
-        class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80"
-      >
-        Get Started <span aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-  </div>
-</header>
-<main class="px-4 py-20 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
-    <.flash_group flash={@flash} />
-    {@inner_content}
-  </div>
-</main>
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={Phoenix.Controller.get_csrf_token()} />
+    <.live_title suffix=" · F1 News">
+      <%= assigns[:page_title] || "F1 News" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}></script>
+    <!-- Swiper.js CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Formula1 Font -->
+    <link rel="stylesheet" href="https://c3f3e9w4.rocketcdn.me/wp-content/themes/formula1/fonts/Formula1.css" />
+  </head>
+  <body class="bg-gray-100 antialiased font-formula1">
+    <!-- Header -->
+    <header class="bg-red-600 text-white shadow-lg">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div class="text-2xl font-bold">
+          <a href={~p"/"}>F1 News</a>
+        </div>
+        <div class="flex space-x-4 items-center">
+          <a href={~p"/"} class="hover:text-gray-200">Home</a>
+          <a href={~p"/standings"} class="hover:text-gray-200">Standings</a>
+          <a href={~p"/schedule"} class="hover:text-gray-200">Schedule</a>
+          <a href={~p"/results"} class="hover:text-gray-200">Results</a>
+          <a href={~p"/news"} class="hover:text-gray-200">News</a>
+          <a href={~p"/teams-drivers"} class="hover:text-gray-200">Teams & Drivers</a>
+          <%= if assigns[:current_user] do %>
+            <span class="text-sm"><%= assigns[:current_user].email %></span>
+            <a href={~p"/users/settings"} class="hover:text-gray-200">Settings</a>
+            <form action={~p"/users/log_out"} method="post" class="inline">
+              <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()}>
+              <input type="hidden" name="_method" value="delete">
+              <button type="submit" class="hover:text-gray-200">Log out</button>
+            </form>
+          <% else %>
+            <a href={~p"/users/register"} class="hover:text-gray-200">Register</a>
+            <a href={~p"/users/log_in"} class="hover:text-gray-200">Log in</a>
+          <% end %>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <%= @inner_content %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <div>
+          <p>© 2025 F1 News. All rights reserved.</p>
+        </div>
+        <div class="flex space-x-4">
+          <a href="https://x.com/f1" class="hover:text-gray-300">Follow us on X</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

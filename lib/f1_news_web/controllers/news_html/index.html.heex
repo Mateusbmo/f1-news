@@ -1,0 +1,16 @@
+<h1 class="text-3xl font-bold mb-4">Listing News</h1>
+
+<.flash_group flash={@flash} />
+
+<.table id="news" rows={@news_collection}>
+  <:col :let={news} label="Title"><%= news.title %></:col>
+  <:col :let={news} label="Author"><%= news.author %></:col>
+  <:col :let={news} label="Published at"><%= news.published_at %></:col>
+  <:action :let={news}>
+    <.link href={~p"/news/#{news.id}"} class="text-blue-600 hover:text-blue-800">Show</.link>
+    <.link href={~p"/news/#{news.id}/edit"} class="text-blue-600 hover:text-blue-800">Edit</.link>
+    <.link href={~p"/news/#{news.id}"} method="delete" data-confirm="Are you sure?" class="text-red-600 hover:text-red-800">Delete</.link>
+  </:action>
+</.table>
+
+<.link href={~p"/news/new"} class="btn btn-primary mt-4">New News</.link>

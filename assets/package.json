@@ -2,11 +2,12 @@
     "name": "f1_news",
     "version": "0.1.0",
     "dependencies": {
-      "esbuild": "^0.17.5",
-      "tailwindcss": "^3.2.4"
+        "esbuild": "^0.17.5",
+        "swiper": "^11.2.6",
+        "tailwindcss": "^3.2.4"
     },
     "scripts": {
-      "deploy": "NODE_ENV=production mix assets.deploy",
-      "watch": "mix assets.watch"
+        "deploy": "NODE_ENV=production mix assets.deploy",
+        "watch": "mix assets.watch"
     }
-  }
+}

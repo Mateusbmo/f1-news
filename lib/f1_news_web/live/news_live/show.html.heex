@@ -1,0 +1,16 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-3xl font-bold mb-4"><%= @news.title %></h1>
+
+  <div class="card bg-base-100 shadow-xl">
+    <figure><img src={@news.image_url} alt={@news.title} class="w-full h-64 object-cover" /></figure>
+    <div class="card-body">
+      <p><strong>Author:</strong> <%= @news.author %></p>
+      <p><strong>Published:</strong> <%= DateTime.to_date(@news.published_at) %></p>
+      <p><%= @news.content %></p>
+      <div class="card-actions justify-end">
+        <.link navigate={~p"/news/#{@news}/edit"} class="btn btn-primary">Edit</.link>
+        <.link navigate={~p"/news"} class="btn btn-secondary">Back to news</.link>
+      </div>
+    </div>
+  </div>
+</div>

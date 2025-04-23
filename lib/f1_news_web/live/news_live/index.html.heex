@@ -1,0 +1,41 @@
+<.header>
+  Listing News
+  <:actions>
+    <.link patch={~p"/news/new"}>
+      <.button>New News</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="news"
+  rows={@streams.news_collection}
+  row_click={fn {_id, news} -> JS.navigate(~p"/news/#{news}") end}
+>
+  <:col :let={{_id, news}} label="Index">{news.index}</:col>
+  <:action :let={{_id, news}}>
+    <div class="sr-only">
+      <.link navigate={~p"/news/#{news}"}>Show</.link>
+    </div>
+    <.link patch={~p"/news/#{news}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, news}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: news.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="news-modal" show on_cancel={JS.patch(~p"/news")}>
+  <.live_component
+    module={F1NewsWeb.NewsLive.FormComponent}
+    id={@news.id || :new}
+    title={@page_title}
+    action={@live_action}
+    news={@news}
+    patch={~p"/news"}
+  />
+</.modal>

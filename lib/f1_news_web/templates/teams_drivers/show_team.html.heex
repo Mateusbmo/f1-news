@@ -1,0 +1,14 @@
+<section class="py-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 font-formula1"><%= @team.name %></h1>
+    <img src={@team.car_image} alt={@team.name} class="w-full h-64 object-contain bg-gray-100 mb-6 rounded-lg" />
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <h2 class="text-2xl font-semibold mb-4 font-formula1">História</h2>
+      <p class="text-gray-700 mb-4"><%= @team.history %></p>
+      <p class="text-gray-600 mb-2"><strong>Fundada:</strong> <%= @team.founded %></p>
+      <p class="text-gray-600 mb-2"><strong>Títulos de Construtores:</strong> <%= @team.championships %></p>
+      <p class="text-gray-600 mb-4"><strong>Pilotos:</strong> <%= Enum.join(@team.drivers, ", ") %></p>
+      <a href={~p"/teams-drivers"} class="text-red-600 hover:underline">Voltar para Teams & Drivers</a>
+    </div>
+  </div>
+</section>
