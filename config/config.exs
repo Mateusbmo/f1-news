@@ -4,9 +4,9 @@
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
 
-# General application configuration
 import Config
 
+# General application configuration
 config :f1_news,
   ecto_repos: [F1News.Repo],
   generators: [timestamp_type: :utc_datetime]
@@ -61,6 +61,9 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{config_env()}.exs"
+# Import environment specific config
+if config_env() == :prod do
+  import_config "prod.exs"
+else
+  import_config "dev.exs"
+end
