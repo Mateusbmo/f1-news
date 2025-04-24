@@ -35,6 +35,10 @@ f1_news-*.tar
 /assets/node_modules/
 /assets/package-lock.json
 
+# Ignore release-related files
+/lib/f1_news/release.ex
+/rel/
+
 # Ignore .DS_Store files (macOS)
 .DS_Store
 
