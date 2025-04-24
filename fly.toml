@@ -1,0 +1,18 @@
+app = "f1kiyoshi"
+primary_region = "ord"
+
+[build]
+  [build.args]
+    MIX_ENV = "prod"
+
+[env]
+  PHX_HOST = "f1kiyoshi.fly.dev"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]

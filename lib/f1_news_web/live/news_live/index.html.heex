@@ -12,7 +12,7 @@
   rows={@streams.news_collection}
   row_click={fn {_id, news} -> JS.navigate(~p"/news/#{news}") end}
 >
-  <:col :let={{_id, news}} label="Index">{news.index}</:col>
+  <:col :let={{_id, news}} label="ID">{news.id}</:col>
   <:col :let={{_id, news}} label="Title">{news.title}</:col>
   <:col :let={{_id, news}} label="Content">{news.content}</:col>
   <:action :let={{_id, news}}>

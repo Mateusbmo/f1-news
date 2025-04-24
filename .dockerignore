@@ -1,0 +1,23 @@
+# Ignore build artifacts
+/_build
+/deps
+/cover
+/doc
+*.ez
+erl_crash.dump
+
+# Ignore node_modules
+/assets/node_modules
+/assets/package-lock.json
+
+# Ignore temporary files
+/tmp
+*.log
+
+# Ignore Git and macOS files
+.git
+.gitignore
+.DS_Store
+
+# Ignore GitHub workflows
+/.github/
