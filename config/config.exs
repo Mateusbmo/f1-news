@@ -62,4 +62,8 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 # Import environment specific config
-import_config "#{config_env()}.exs"
+if config_env() == :prod do
+  import_config "prod.exs"
+else
+  import_config "dev.exs"
+end
