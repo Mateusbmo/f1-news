@@ -1,72 +1,98 @@
-# Use official Elixir image
-FROM hexpm/elixir:1.18.2-erlang-27.3-debian-bullseye-20250224-slim AS builder
+# Find eligible builder and runner images on Docker Hub. We use Ubuntu/Debian
+# instead of Alpine to avoid DNS resolution issues in production.
+#
+# https://hub.docker.com/r/hexpm/elixir/tags?page=1&name=ubuntu
+# https://hub.docker.com/_/ubuntu?tab=tags
+#
+# This file is based on these images:
+#
+#   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
+#   - https://hub.docker.com/_/debian?tab=tags&page=1&name=bullseye-20250224-slim - for the release image
+#   - https://pkgs.org/ - resource for finding needed packages
+#   - Ex: hexpm/elixir:1.18.2-erlang-27.3-debian-bullseye-20250224-slim
+#
+ARG ELIXIR_VERSION=1.18.2
+ARG OTP_VERSION=27.3
+ARG DEBIAN_VERSION=bullseye-20250224-slim
 
-# Install dependencies
+ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
+
+FROM ${BUILDER_IMAGE} AS builder
+
+# install build dependencies
 RUN apt-get update -y && \
     apt-get install -y build-essential git nodejs npm && \
     apt-get clean && \
     rm -f /var/lib/apt/lists/*_*
 
-# Set working directory
+# prepare build dir
 WORKDIR /app
 
-# Install Hex and Rebar
+# install hex + rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# Set environment variables
-ENV MIX_ENV=prod
+# set build ENV
+ENV MIX_ENV="prod"
 
-# Copy mix files
+# install mix dependencies
 COPY mix.exs mix.lock ./
-
-# Install dependencies
-RUN mix deps.get --only prod
+RUN mix deps.get --only $MIX_ENV
 RUN mix deps.compile
 
-# Copy config files
-COPY config/config.exs config/prod.exs config/
+# copy config
+COPY config/config.exs config/$MIX_ENV.exs config/
 
-# Copy application code
-COPY assets assets
-COPY priv priv
-COPY lib lib
+# copy assets
+COPY assets assets/
 
-# Install npm dependencies and compile assets
-RUN cd assets && npm install && cd ..
-RUN mix assets.deploy
+# copy static assets and application code
+COPY priv priv/
+COPY lib lib/
 
-# Compile application
+# install npm dependencies and deploy assets
+RUN cd assets && npm install && cd .. && \
+    mix assets.deploy
+
+# compile app
 RUN mix compile
 
-# Build release
-COPY rel rel
+# copy release config
+COPY rel rel/
+
+# build release
 RUN mix release
 
-# Final stage
-FROM debian:bullseye-20250224-slim
+# start a new build stage so that the final image will only contain
+# the compiled release and other runtime necessities
+FROM ${RUNNER_IMAGE}
 
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && \
     apt-get clean && \
     rm -f /var/lib/apt/lists/*_*
 
-# Set locale
+# Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-WORKDIR /app
+WORKDIR "/app"
 RUN chown nobody /app
 
-# Set environment variables
-ENV MIX_ENV=prod
+# set runner ENV
+ENV MIX_ENV="prod"
 
-# Copy release
-COPY --from=builder --chown=nobody:root /app/_build/prod/rel/f1_news ./
+# Only copy the final release from the build stage
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/f1_news ./
 
 USER nobody
 
-CMD ["/app/bin/f1_news", "start"]
+# Healthcheck to ensure the app is running
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:8080/ || exit 1
+
+CMD ["/app/bin/server"]
