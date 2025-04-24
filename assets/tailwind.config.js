@@ -7,7 +7,7 @@ module.exports = {
     "./js/**/*.js",
     "../lib/f1_news_web.ex",
     "../lib/f1_news_web/**/*.*ex",
-    "../deps/heroicons/optimized/**/*.svg"
+    "./icons/heroicons/**/*.svg"
   ],
   theme: {
     extend: {
@@ -23,7 +23,7 @@ module.exports = {
     plugin(({addVariant}) => addVariant("phx-submit-loading", [".phx-submit-loading&", ".phx-submit-loading &"])),
     plugin(({addVariant}) => addVariant("phx-change-loading", [".phx-change-loading&", ".phx-change-loading &"])),
     plugin(function({matchComponents, theme}) {
-      let iconsDir = path.join(__dirname, "../deps/heroicons/optimized");
+      let iconsDir = path.join(__dirname, "./icons/heroicons");
       let values = {};
       let icons = [
         ["", "/24/outline"],

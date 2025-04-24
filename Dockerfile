@@ -34,8 +34,6 @@ COPY lib lib
 
 # Install npm dependencies and compile assets
 RUN cd assets && npm install && cd ..
-RUN mix deps.get --only prod # Ensure heroicons is fetched
-RUN mix deps.compile # Recompile to include heroicons
 RUN mix assets.deploy
 
 # Compile application

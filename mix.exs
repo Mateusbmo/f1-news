@@ -36,7 +36,6 @@ defmodule F1News.MixProject do
       {:phoenix_live_dashboard, "~> 0.8.6"},
       {:esbuild, "~> 0.9.0", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3.1", runtime: Mix.env() == :dev},
-      {:heroicons, "~> 0.5"},
       {:swoosh, "~> 1.18.4"},
       {:finch, "~> 0.19.0"},
       {:telemetry_metrics, "~> 1.1.0"},
