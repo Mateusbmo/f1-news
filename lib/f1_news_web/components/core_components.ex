@@ -366,7 +366,6 @@ defmodule F1NewsWeb.CoreComponents do
     """
   end
 
-  # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
     <div>
