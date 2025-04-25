@@ -17,28 +17,19 @@ config :swoosh, local: false
 config :logger, level: :info
 
 # Configure your database
-database_url = System.get_env("DATABASE_URL")
+database_url = System.get_env("DATABASE_URL") || raise "DATABASE_URL not set"
+uri = URI.parse(database_url)
 
-# Parse DATABASE_URL if available
-if database_url do
-  uri = URI.parse(database_url)
-
-  config :f1_news, F1News.Repo,
-    adapter: Ecto.Adapters.Postgres,
-    username: uri.userinfo && String.split(uri.userinfo, ":") |> List.first(),
-    password: uri.userinfo && String.split(uri.userinfo, ":") |> List.last(),
-    database: uri.path && String.trim_leading(uri.path, "/"),
-    hostname: uri.host,
-    port: uri.port,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    ssl: true,
-    ssl_opts: [
-      verify: :verify_peer,
-      cacerts: :castore.cacerts()
-    ]
-else
-  # Fallback for build time (no DATABASE_URL needed for assets.deploy)
-  config :f1_news, F1News.Repo,
-    adapter: Ecto.Adapters.Postgres,
-    pool_size: 10
-end
+config :f1_news, F1News.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: uri.userinfo |> String.split(":") |> List.first(),
+  password: uri.userinfo |> String.split(":") |> List.last(),
+  database: uri.path |> String.trim_leading("/"),
+  hostname: uri.host,
+  port: uri.port,
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+  ssl: true,
+  ssl_opts: [
+    verify: :verify_peer,
+    cacerts: :castore.cacerts()
+  ]
