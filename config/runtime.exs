@@ -14,28 +14,20 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  # Validar e parsear a DATABASE_URL
-  uri = URI.parse(database_url)
-  database =
-    if uri.path && uri.path != "/" do
-      uri.path |> String.trim_leading("/")
-    else
-      raise """
-      DATABASE_URL is invalid: missing database name in path.
-      Got: #{database_url}
-      Expected: ecto://USER:PASS@HOST/DATABASE
-      """
-    end
+  # Log the DATABASE_URL for debugging
+  IO.puts("DATABASE_URL: #{database_url}")
 
   config :f1_news, F1News.Repo,
     url: database_url,
-    database: database,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     ssl: true,
     ssl_opts: [
       verify: :verify_peer,
       cacerts: :castore.cacerts()
     ]
+
+  # Log the Repo configuration for debugging
+  IO.inspect(F1News.Repo.config(), label: "F1News.Repo Config")
 
   # Secret key base for cookies and secrets
   secret_key_base =
