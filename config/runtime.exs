@@ -14,11 +14,19 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  # Log the DATABASE_URL for debugging
+  # Log the DATABASE_URL immediately
   IO.puts("DATABASE_URL: #{database_url}")
+
+  # Parse DATABASE_URL to extract database name
+  uri = URI.parse(database_url)
+  database_name = uri.path |> String.trim_leading("/") |> String.trim()
+
+  # Log parsed database name
+  IO.puts("Parsed database name: #{database_name}")
 
   config :f1_news, F1News.Repo,
     url: database_url,
+    database: database_name,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     ssl: true,
     ssl_opts: [
@@ -26,7 +34,7 @@ if config_env() == :prod do
       cacerts: :castore.cacerts()
     ]
 
-  # Log the Repo configuration for debugging
+  # Log the Repo configuration
   IO.inspect(F1News.Repo.config(), label: "F1News.Repo Config")
 
   # Secret key base for cookies and secrets
