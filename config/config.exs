@@ -1,5 +1,9 @@
 import Config
 
+# Log the environment to debug
+IO.puts("Config environment in config.exs: #{inspect(config_env())}")
+IO.puts("MIX_ENV in config.exs: #{System.get_env("MIX_ENV")}")
+
 # General application configuration
 config :f1_news,
   ecto_repos: [F1News.Repo],
@@ -54,4 +58,8 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 # Import environment specific config
-import_config "#{config_env()}.exs"
+if System.get_env("MIX_ENV") == "prod" do
+  import_config "prod.exs"
+else
+  import_config "dev.exs"
+end

@@ -17,7 +17,7 @@ if System.get_env("PHX_SERVER") do
   config :f1_news, F1NewsWeb.Endpoint, server: true
 end
 
-if config_env() == :prod do
+if System.get_env("MIX_ENV") == "prod" do
   # Log that prod config is being processed
   IO.puts("Processing prod configuration")
 
