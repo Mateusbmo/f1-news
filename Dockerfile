@@ -1,4 +1,4 @@
-# Find eligible builder and runner images on Docker Hub. We use Ubuntu and not Debian because their OpenSSL implementations are compatible with Elixir/Erlang
+# Stage 1: Builder
 FROM hexpm/elixir:1.18.2-erlang-27.3-debian-bullseye-20250224-slim AS builder
 
 # Install build dependencies
@@ -12,29 +12,35 @@ RUN apt-get update -y && \
 # Prepare build dir
 WORKDIR /app
 
+# Set production environment
+ENV MIX_ENV=prod
+
 # Install hex and rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# Copy and install app dependencies
+# Copy mix files
 COPY mix.exs mix.lock ./
-RUN mix deps.get --only prod
-RUN mix deps.compile
 
-# Copy config
-COPY config/config.exs config/prod.exs config/
-COPY config/runtime.exs config/
+# Install production dependencies
+RUN mix deps.get --only prod && \
+    mix deps.compile
 
-# Copy source code
-COPY assets assets/
-COPY priv priv/
+# Copy runtime configuration
+COPY config/config.exs config/prod.exs config/runtime.exs config/
+
+# Copy application code
 COPY lib lib/
+COPY priv priv/
+COPY assets assets/
 
-# Build assets
-RUN cd assets && npm install && cd .. && \
+# Build assets (with production settings)
+RUN cd assets && \
+    npm install && \
+    cd .. && \
     mix assets.deploy
 
-# Compile the app
+# Compile the application
 RUN mix compile
 
 # Copy release configuration
@@ -43,9 +49,10 @@ COPY rel rel/
 # Build the release
 RUN mix release
 
-# Start a new build stage for a slim image
+# Stage 2: Runner
 FROM debian:bullseye-20250224-slim
 
+# Install runtime dependencies
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && \
     apt-get clean && \
@@ -54,16 +61,20 @@ RUN apt-get update -y && \
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
+# Setup working directory
 WORKDIR /app
 RUN chown nobody /app
 
-# Copy the release from the builder
+# Copy release from builder
 COPY --from=builder --chown=nobody:root /app/_build/prod/rel/f1_news ./
 
-USER nobody
-
-# Set environment to production
+# Environment variables
 ENV MIX_ENV=prod
+ENV PORT=8080
 ENV ERL_AFLAGS="-proto_dist inet6_tcp"
 
-CMD ["/app/bin/server"]
+# Run as nobody
+USER nobody
+
+# The command to run when the container starts
+CMD ["/app/bin/f1_news", "start"]

@@ -1,26 +1,9 @@
 import Config
 
-# Log immediately to confirm runtime.exs is loaded
-IO.puts("Loading config/runtime.exs")
+# Log initialization
+IO.puts("Loading runtime configuration for #{config_env()} environment")
 
-# Log the environment
-IO.puts("Config environment: #{inspect(config_env())}")
-
-# Log MIX_ENV
-IO.puts("MIX_ENV: #{System.get_env("MIX_ENV")}")
-
-# Log all environment variables
-IO.puts("Environment variables: #{inspect(System.get_env())}")
-
-# Enable server for releases
-if System.get_env("PHX_SERVER") do
-  config :f1_news, F1NewsWeb.Endpoint, server: true
-end
-
-if System.get_env("MIX_ENV") == "prod" do
-  # Log that prod config is being processed
-  IO.puts("Processing prod configuration")
-
+if config_env() == :prod do
   # Database configuration
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -29,19 +12,8 @@ if System.get_env("MIX_ENV") == "prod" do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  # Log the DATABASE_URL immediately
-  IO.puts("DATABASE_URL: #{database_url}")
-
-  # Parse DATABASE_URL to extract database name
-  uri = URI.parse(database_url)
-  database_name = uri.path |> String.trim_leading("/") |> String.trim()
-
-  # Log parsed database name
-  IO.puts("Parsed database name: #{database_name}")
-
   config :f1_news, F1News.Repo,
     url: database_url,
-    database: database_name,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     ssl: true,
     ssl_opts: [
@@ -49,10 +21,7 @@ if System.get_env("MIX_ENV") == "prod" do
       cacerts: :castore.cacerts()
     ]
 
-  # Log the Repo configuration
-  IO.inspect(F1News.Repo.config(), label: "F1News.Repo Config")
-
-  # Secret key base for cookies and secrets
+  # Secret key base
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
       raise """
@@ -60,16 +29,18 @@ if System.get_env("MIX_ENV") == "prod" do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "f1kiyoshi.fly.dev"
-  port = String.to_integer(System.get_env("PORT") || "8080")
-
-  config :f1_news, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  # Host configuration
+  host = System.get_env("PHX_HOST") || "example.com"
+  port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :f1_news, F1NewsWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
+      ip: {0, 0, 0, 0},
       port: port
     ],
     secret_key_base: secret_key_base
+
+  # DNS cluster configuration
+  config :f1_news, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 end

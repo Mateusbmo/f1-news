@@ -1,22 +1,27 @@
 app = "f1kiyoshi"
 primary_region = "ord"
 
-[build.args]
-MIX_ENV = "prod"
+[build]
+  args = { MIX_ENV = "prod" }
 
 [env]
-MIX_ENV = "prod"
-PHX_HOST = "f1kiyoshi.fly.dev"
-PORT = "8080"
+  MIX_ENV = "prod"
+  PHX_HOST = "f1kiyoshi.fly.dev"
+  PORT = "8080"
+  ECTO_IPV6 = "true"
+  SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt"
 
 [http_service]
-auto_start_machines = true
-auto_stop_machines = false
-force_https = true
-internal_port = 8080
-min_machines_running = 1
-processes = ["app"]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[deploy]
+  release_command = "/app/bin/f1_news eval 'F1News.Release.migrate'"
 
 [[vm]]
-size = "shared-cpu-1x"
-memory = "512mb"
+  size = "shared-cpu-1x"
+  memory = "512mb"
