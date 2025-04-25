@@ -40,3 +40,4 @@ else
     adapter: Ecto.Adapters.Postgres,
     pool_size: 10
 end
+# Forced change to ensure commit Qui 24 Abr 2025 23:36:02 -03
