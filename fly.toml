@@ -8,6 +8,7 @@ MIX_ENV = "prod"
 MIX_ENV = "prod"
 PHX_HOST = "f1kiyoshi.fly.dev"
 PORT = "8080"
+PHX_SERVER = "true"
 
 [http_service]
 auto_start_machines = true
@@ -20,6 +21,3 @@ processes = ["app"]
 [[vm]]
 size = "shared-cpu-1x"
 memory = "512mb"
-
-[processes]
-app = "MIX_ENV=prod /app/bin/server"
