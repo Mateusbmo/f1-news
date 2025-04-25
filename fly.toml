@@ -16,9 +16,6 @@ internal_port = 8080
 min_machines_running = 1
 processes = ["app"]
 
-[deploy]
-release_command = "/app/bin/migrate"
-
 [[vm]]
 size = "shared-cpu-1x"
 memory = "512mb"
