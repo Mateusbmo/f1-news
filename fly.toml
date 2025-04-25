@@ -5,6 +5,7 @@ primary_region = "ord"
 MIX_ENV = "prod"
 
 [env]
+MIX_ENV = "prod"
 PHX_HOST = "f1kiyoshi.fly.dev"
 PORT = "8080"
 
