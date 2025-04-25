@@ -1,8 +1,8 @@
 # Find eligible builder and runner images on Docker Hub. We use Ubuntu/Debian
 # instead of Alpine to avoid DNS resolution issues in production.
 #
-# https://hub.docker.com/r/hexpm/elixir/tags?page=1&name=ubuntu
-# https://hub.docker.com/_/ubuntu?tab=tags
+# https://hub.docker.com/r/hexpm/elixir/tags?page=1&name=debian
+# https://hub.docker.com/_/debian?tab=tags
 #
 # This file is based on these images:
 #
@@ -22,7 +22,9 @@ FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
 RUN apt-get update -y && \
-    apt-get install -y build-essential git nodejs npm && \
+    apt-get install -y build-essential git curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
     apt-get clean && \
     rm -f /var/lib/apt/lists/*_*
 
@@ -51,7 +53,7 @@ COPY assets assets/
 COPY priv priv/
 COPY lib lib/
 
-# install npm dependencies and deploy assets
+# install npm dependencies and deploy assetsamid
 RUN cd assets && npm install && cd .. && \
     mix assets.deploy
 
