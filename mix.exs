@@ -16,7 +16,7 @@ defmodule F1News.MixProject do
   def application do
     [
       mod: {F1News.Application, []},
-      extra_applications: [:logger, :runtime_tools, :ssl, :inets]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -45,7 +45,9 @@ defmodule F1News.MixProject do
       {:jason, "~> 1.4"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:castore, "~> 1.0"}
+      {:castore, "~> 1.0"},
+      {:bcrypt_elixir, "~> 3.2"},
+      {:httpoison, "~> 2.2"}
     ]
   end
 
@@ -56,10 +58,10 @@ defmodule F1News.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind default", "esbuild default"],
+      "assets.build": ["tailwind f1_news", "esbuild f1_news"],
       "assets.deploy": [
-        "tailwind default --minify",
-        "esbuild default --minify",
+        "tailwind f1_news --minify",
+        "esbuild f1_news --minify",
         "phx.digest"
       ]
     ]

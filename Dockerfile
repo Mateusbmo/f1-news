@@ -69,4 +69,4 @@ USER nobody
 ENV MIX_ENV=prod
 ENV ERL_AFLAGS="-proto_dist inet6_tcp"
 
-CMD ["/app/bin/server"]
+CMD ["/bin/sh", "-c", "MIX_ENV=prod /app/bin/server"]
