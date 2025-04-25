@@ -6,7 +6,7 @@ IO.puts("Loading config/runtime.exs")
 # Log the environment
 IO.puts("Config environment: #{inspect(config_env())}")
 
-# Log all environment variables (for debugging)
+# Log all environment variables
 IO.puts("Environment variables: #{inspect(System.get_env())}")
 
 # Enable server for releases
@@ -17,37 +17,6 @@ end
 if config_env() == :prod do
   # Log that prod config is being processed
   IO.puts("Processing prod configuration")
-
-  # Database configuration
-  database_url =
-    System.get_env("DATABASE_URL") ||
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
-
-  # Log the DATABASE_URL immediately
-  IO.puts("DATABASE_URL: #{database_url}")
-
-  # Parse DATABASE_URL to extract database name
-  uri = URI.parse(database_url)
-  database_name = uri.path |> String.trim_leading("/") |> String.trim()
-
-  # Log parsed database name
-  IO.puts("Parsed database name: #{database_name}")
-
-  config :f1_news, F1News.Repo,
-    url: database_url,
-    database: database_name,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    ssl: true,
-    ssl_opts: [
-      verify: :verify_peer,
-      cacerts: :castore.cacerts()
-    ]
-
-  # Log the Repo configuration
-  IO.inspect(F1News.Repo.config(), label: "F1News.Repo Config")
 
   # Secret key base for cookies and secrets
   secret_key_base =
