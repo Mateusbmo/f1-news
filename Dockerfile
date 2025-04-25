@@ -56,6 +56,7 @@ RUN apt-get update -y && \
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG=C.UTF-8
 
 WORKDIR /app
 RUN chown nobody /app
