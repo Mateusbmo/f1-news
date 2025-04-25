@@ -1,4 +1,4 @@
-# Stage 1: Builder
+# Find eligible builder and runner images on Docker Hub
 FROM hexpm/elixir:1.18.2-erlang-27.3-debian-bullseye-20250224-slim AS builder
 
 # Install build dependencies
@@ -12,35 +12,32 @@ RUN apt-get update -y && \
 # Prepare build dir
 WORKDIR /app
 
-# Set production environment
+# Set build environment
 ENV MIX_ENV=prod
 
 # Install hex and rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# Copy mix files
+# Copy and install app dependencies
 COPY mix.exs mix.lock ./
+RUN mix deps.get --only prod
+RUN mix deps.compile
 
-# Install production dependencies
-RUN mix deps.get --only prod && \
-    mix deps.compile
+# Copy config
+COPY config/config.exs config/prod.exs config/
+COPY config/runtime.exs config/
 
-# Copy config files (excluding dev.exs)
-COPY config/config.exs config/prod.exs config/runtime.exs config/
-
-# Copy application code
-COPY lib lib/
-COPY priv priv/
+# Copy source code
 COPY assets assets/
+COPY priv priv/
+COPY lib lib/
 
-# Build assets (with production settings)
-RUN cd assets && \
-    npm install && \
-    cd .. && \
-    mix do deps.loadpaths --no-deps-check, assets.deploy
+# Build assets
+RUN cd assets && npm install && cd .. && \
+    mix assets.deploy
 
-# Compile the application
+# Compile the app
 RUN mix compile
 
 # Copy release configuration
@@ -49,10 +46,9 @@ COPY rel rel/
 # Build the release
 RUN mix release
 
-# Stage 2: Runner
+# Start a new build stage for a slim image
 FROM debian:bullseye-20250224-slim
 
-# Install runtime dependencies
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && \
     apt-get clean && \
@@ -61,20 +57,16 @@ RUN apt-get update -y && \
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
-# Setup working directory
 WORKDIR /app
 RUN chown nobody /app
 
-# Copy release from builder
+# Copy the release from the builder
 COPY --from=builder --chown=nobody:root /app/_build/prod/rel/f1_news ./
 
-# Environment variables
-ENV MIX_ENV=prod
-ENV PORT=8080
-ENV ERL_AFLAGS="-proto_dist inet6_tcp"
-
-# Run as nobody
 USER nobody
 
-# The command to run when the container starts
-CMD ["/app/bin/f1_news", "start"]
+# Set runtime environment
+ENV MIX_ENV=prod
+ENV ERL_AFLAGS="-proto_dist inet6_tcp"
+
+CMD ["/app/bin/server"]

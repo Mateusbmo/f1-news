@@ -1,41 +1,46 @@
 import Config
 
+# Log the environment to debug
+IO.puts("Config environment in config.exs: #{inspect(config_env())}")
+IO.puts("MIX_ENV in config.exs: #{System.get_env("MIX_ENV")}")
+
 # General application configuration
 config :f1_news,
   ecto_repos: [F1News.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-# Basic Repo configuration
+# Configures the repository
 config :f1_news, F1News.Repo,
   adapter: Ecto.Adapters.Postgres
 
-# Endpoint configuration
+# Configures the endpoint
 config :f1_news, F1NewsWeb.Endpoint,
   url: [host: "localhost"],
+  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: F1NewsWeb.ErrorHTML, json: F1NewsWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: F1News.PubSub,
-  live_view: [signing_salt: System.get_env("SIGNING_SALT") || "bZuBmudC"]
+  live_view: [signing_salt: "bZuBmudC"]
 
-# Mailer configuration
-config :f1_news, F1News.Mailer,
-  adapter: Swoosh.Adapters.Local
+# Configures the mailer
+config :f1_news, F1News.Mailer, adapter: Swoosh.Adapters.Local
 
-# Esbuild configuration
+# Configure esbuild
 config :esbuild,
   version: "0.17.11",
-  default: [
-    args: ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets),
+  f1_news: [
+    args:
+      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Tailwind configuration
+# Configure tailwind
 config :tailwind,
   version: "3.4.3",
-  default: [
+  f1_news: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css
@@ -44,21 +49,13 @@ config :tailwind,
     cd: Path.expand("../assets", __DIR__)
   ]
 
-# Logger configuration
+# Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# Jason configuration
+# Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Import environment specific config
-case config_env() do
-  :prod -> import_config "prod.exs"
-  :dev -> import_config "dev.exs"
-end
-
-# Always import runtime.exs if it exists
-if File.exists?("config/runtime.exs") do
-  import_config "runtime.exs"
-end
+# Import prod config for production builds
+import_config "prod.exs"
