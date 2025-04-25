@@ -1,11 +1,5 @@
 import Config
 
-# config/runtime.exs is executed for all environments, including
-# during releases. It is executed after compilation and before the
-# system starts, so it is typically used to load production configuration
-# and secrets from environment variables or elsewhere. Do not define
-# any compile-time configuration in here, as it won't be applied.
-
 # Enable server for releases
 if System.get_env("PHX_SERVER") do
   config :f1_news, F1NewsWeb.Endpoint, server: true
@@ -19,15 +13,23 @@ if config_env() == :prod do
       environment variable DATABASE_URL is missing.
       For example: ecto://USER:PASS@HOST/DATABASE
       """
+
+  # Validar e parsear a DATABASE_URL
   uri = URI.parse(database_url)
+  database =
+    if uri.path && uri.path != "/" do
+      uri.path |> String.trim_leading("/")
+    else
+      raise """
+      DATABASE_URL is invalid: missing database name in path.
+      Got: #{database_url}
+      Expected: ecto://USER:PASS@HOST/DATABASE
+      """
+    end
 
   config :f1_news, F1News.Repo,
-    adapter: Ecto.Adapters.Postgres,
-    username: uri.userinfo |> String.split(":") |> List.first(),
-    password: uri.userinfo |> String.split(":") |> List.last(),
-    database: uri.path |> String.trim_leading("/"),
-    hostname: uri.host,
-    port: uri.port,
+    url: database_url,
+    database: database,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     ssl: true,
     ssl_opts: [
