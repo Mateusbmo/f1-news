@@ -26,7 +26,7 @@ COPY mix.exs mix.lock ./
 RUN mix deps.get --only prod && \
     mix deps.compile
 
-# Copy runtime configuration
+# Copy config files (excluding dev.exs)
 COPY config/config.exs config/prod.exs config/runtime.exs config/
 
 # Copy application code
@@ -38,7 +38,7 @@ COPY assets assets/
 RUN cd assets && \
     npm install && \
     cd .. && \
-    mix assets.deploy
+    mix do deps.loadpaths --no-deps-check, assets.deploy
 
 # Compile the application
 RUN mix compile

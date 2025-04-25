@@ -1,18 +1,23 @@
 import Config
 
-# Configurações específicas de produção
+# Config static file cache
 config :f1_news, F1NewsWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   code_reloader: false
 
-# Configuração do Swoosh para produção
+# Config Swoosh
 config :swoosh,
   api_client: Swoosh.ApiClient.Finch,
-  finch_name: F1News.Finch
+  finch_name: F1News.Finch,
+  local: false
 
-# Configuração do Logger para produção
+# Config Logger
 config :logger, level: :info
 
-# Desabilita o Swoosh local em produção
-config :swoosh, :local, false
+# Disable dev routes in production
+config :f1_news, :dev_routes, false
+
+# Disable debug and live reload in production
+config :phoenix, :debug_errors, false
+config :phoenix, :code_reloader, false

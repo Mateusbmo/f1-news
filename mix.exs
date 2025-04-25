@@ -56,10 +56,10 @@ defmodule F1News.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind f1_news", "esbuild f1_news"],
+      "assets.build": ["tailwind default", "esbuild default"],
       "assets.deploy": [
-        "tailwind f1_news --minify",
-        "esbuild f1_news --minify",
+        "tailwind default --minify",
+        "esbuild default --minify",
         "phx.digest"
       ]
     ]

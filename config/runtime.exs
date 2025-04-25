@@ -1,8 +1,5 @@
 import Config
 
-# Log initialization
-IO.puts("Loading runtime configuration for #{config_env()} environment")
-
 if config_env() == :prod do
   # Database configuration
   database_url =
