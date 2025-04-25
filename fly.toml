@@ -1,18 +1,24 @@
 app = "f1kiyoshi"
 primary_region = "ord"
 
-[build]
-  [build.args]
-    MIX_ENV = "prod"
+[build.args]
+MIX_ENV = "prod"
 
 [env]
-  PHX_HOST = "f1kiyoshi.fly.dev"
-  PORT = "8080"
+PHX_HOST = "f1kiyoshi.fly.dev"
+PORT = "8080"
 
 [http_service]
-  internal_port = 8080
-  force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ["app"]
+auto_start_machines = true
+auto_stop_machines = false
+force_https = true
+internal_port = 8080
+min_machines_running = 1
+processes = ["app"]
+
+[deploy]
+release_command = "/app/bin/migrate"
+
+[[vm]]
+size = "shared-cpu-1x"
+memory = "512mb"
