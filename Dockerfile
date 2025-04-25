@@ -1,26 +1,7 @@
-# Find eligible builder and runner images on Docker Hub. We use Ubuntu/Debian
-# instead of Alpine to avoid DNS resolution issues in production.
-#
-# https://hub.docker.com/r/hexpm/elixir/tags?page=1&name=debian
-# https://hub.docker.com/_/debian?tab=tags
-#
-# This file is based on these images:
-#
-#   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
-#   - https://hub.docker.com/_/debian?tab=tags&page=1&name=bullseye-20250224-slim - for the release image
-#   - https://pkgs.org/ - resource for finding needed packages
-#   - Ex: hexpm/elixir:1.18.2-erlang-27.3-debian-bullseye-20250224-slim
-#
-ARG ELIXIR_VERSION=1.18.2
-ARG OTP_VERSION=27.3
-ARG DEBIAN_VERSION=bullseye-20250224-slim
+# Find eligible builder and runner images on Docker Hub. We use Ubuntu and not Debian because their OpenSSL implementations are compatible with Elixir/Erlang
+FROM hexpm/elixir:1.18.2-erlang-27.3-debian-bullseye-20250224-slim AS builder
 
-ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
-ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
-
-FROM ${BUILDER_IMAGE} AS builder
-
-# install build dependencies
+# Install build dependencies
 RUN apt-get update -y && \
     apt-get install -y build-essential git curl && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
@@ -28,47 +9,42 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -f /var/lib/apt/lists/*_*
 
-# prepare build dir
+# Prepare build dir
 WORKDIR /app
 
-# install hex + rebar
+# Install hex and rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# set build ENV
-ENV MIX_ENV="prod"
-
-# install mix dependencies
+# Copy and install app dependencies
 COPY mix.exs mix.lock ./
-RUN mix deps.get --only $MIX_ENV
+RUN mix deps.get --only prod
 RUN mix deps.compile
 
-# copy config
-COPY config/config.exs config/$MIX_ENV.exs config/
+# Copy config
+COPY config/config.exs config/prod.exs config/
+COPY config/runtime.exs config/
 
-# copy assets
+# Copy source code
 COPY assets assets/
-
-# copy static assets and application code
 COPY priv priv/
 COPY lib lib/
 
-# install npm dependencies and deploy assetsamid
+# Build assets
 RUN cd assets && npm install && cd .. && \
     mix assets.deploy
 
-# compile app
+# Compile the app
 RUN mix compile
 
-# copy release config
+# Copy release configuration
 COPY rel rel/
 
-# build release
+# Build the release
 RUN mix release
 
-# start a new build stage so that the final image will only contain
-# the compiled release and other runtime necessities
-FROM ${RUNNER_IMAGE}
+# Start a new build stage for a slim image
+FROM debian:bullseye-20250224-slim
 
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && \
@@ -78,23 +54,16 @@ RUN apt-get update -y && \
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
-
-WORKDIR "/app"
+WORKDIR /app
 RUN chown nobody /app
 
-# set runner ENV
-ENV MIX_ENV="prod"
-
-# Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/f1_news ./
+# Copy the release from the builder
+COPY --from=builder --chown=nobody:root /app/_build/prod/rel/f1_news ./
 
 USER nobody
 
-# Healthcheck to ensure the app is running
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:8080/ || exit 1
+# Set environment to production
+ENV MIX_ENV=prod
+ENV ERL_AFLAGS="-proto_dist inet6_tcp"
 
 CMD ["/app/bin/server"]
