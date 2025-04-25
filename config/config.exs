@@ -1,15 +1,13 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
-
 import Config
 
 # General application configuration
 config :f1_news,
   ecto_repos: [F1News.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+# Configures the repository
+config :f1_news, F1News.Repo,
+  adapter: Ecto.Adapters.Postgres
 
 # Configures the endpoint
 config :f1_news, F1NewsWeb.Endpoint,
@@ -23,15 +21,9 @@ config :f1_news, F1NewsWeb.Endpoint,
   live_view: [signing_salt: "bZuBmudC"]
 
 # Configures the mailer
-#
-# By default it uses the "Local" adapter which stores the emails
-# locally. You can see the emails in your browser, at "/dev/mailbox".
-#
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
 config :f1_news, F1News.Mailer, adapter: Swoosh.Adapters.Local
 
-# Configure esbuild (the version is required)
+# Configure esbuild
 config :esbuild,
   version: "0.17.11",
   f1_news: [
@@ -41,7 +33,7 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Configure tailwind (the version is required)
+# Configure tailwind
 config :tailwind,
   version: "3.4.3",
   f1_news: [
