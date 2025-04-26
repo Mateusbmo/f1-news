@@ -46,7 +46,7 @@ if System.get_env("MIX_ENV") == "prod" do
     ssl: true,
     ssl_opts: [
       verify: :verify_peer,
-      cacerts: :castore.cacerts()
+      cacerts: :public_key.cacerts_get()
     ]
 
   # Log the Repo configuration
