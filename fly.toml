@@ -2,22 +2,22 @@ app = "f1kiyoshi"
 primary_region = "ord"
 
 [build.args]
-MIX_ENV = "prod"
+  MIX_ENV = "prod"
 
 [env]
-MIX_ENV = "prod"
-PHX_HOST = "f1kiyoshi.fly.dev"
-PORT = "8080"
-PHX_SERVER = "true"
+  MIX_ENV = "prod"
+  PHX_HOST = "f1kiyoshi.fly.dev"
+  PORT = "8080"
+  PHX_SERVER = "true"
 
 [http_service]
-auto_start_machines = true
-auto_stop_machines = false
-force_https = true
-internal_port = 8080
-min_machines_running = 1
-processes = ["app"]
+  auto_start_machines = true
+  auto_stop_machines = false
+  force_https = true
+  internal_port = 8080
+  min_machines_running = 1
+  processes = ["app"]
 
 [[vm]]
-size = "shared-cpu-1x"
-memory = "512mb"
+  size = "shared-cpu-1x"
+  memory = "512mb"
