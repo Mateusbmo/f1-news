@@ -1,7 +1,7 @@
 import Config
 
-# Log para confirmar carregamento
-IO.puts("Loading config/runtime.exs")
+# Log imediato para confirmar carregamento
+IO.puts("START: Loading config/runtime.exs")
 IO.puts("Config environment: #{inspect(config_env())}")
 IO.puts("MIX_ENV: #{System.get_env("MIX_ENV")}")
 
@@ -55,4 +55,4 @@ if config_env() == :prod do
   IO.puts("Prod configuration applied")
 end
 
-IO.puts("runtime.exs loaded")
+IO.puts("END: runtime.exs loaded")
