@@ -9,6 +9,9 @@ IO.puts("Config environment: #{inspect(config_env())}")
 # Log MIX_ENV
 IO.puts("MIX_ENV: #{System.get_env("MIX_ENV")}")
 
+# Log to confirm environment before prod check
+IO.puts("Checking if environment is prod: #{inspect(config_env() == :prod)}")
+
 # Enable server for releases
 if System.get_env("PHX_SERVER") do
   config :f1_news, F1NewsWeb.Endpoint, server: true
