@@ -9,15 +9,13 @@ IO.puts("Config environment: #{inspect(config_env())}")
 # Log MIX_ENV
 IO.puts("MIX_ENV: #{System.get_env("MIX_ENV")}")
 
-# Log all environment variables
-IO.puts("Environment variables: #{inspect(System.get_env())}")
-
 # Enable server for releases
 if System.get_env("PHX_SERVER") do
   config :f1_news, F1NewsWeb.Endpoint, server: true
 end
 
-if System.get_env("MIX_ENV") == "prod" do
+# Configurações específicas para o ambiente de produção
+if config_env() == :prod do
   # Log that prod config is being processed
   IO.puts("Processing prod configuration")
 
@@ -26,7 +24,7 @@ if System.get_env("MIX_ENV") == "prod" do
     System.get_env("DATABASE_URL") ||
       raise """
       environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
+      For example: postgres://USER:PASS@HOST/DATABASE
       """
 
   # Log the DATABASE_URL immediately
@@ -36,9 +34,11 @@ if System.get_env("MIX_ENV") == "prod" do
   uri = URI.parse(database_url)
   database_name = uri.path |> String.trim_leading("/") |> String.trim()
 
-  # Log parsed database name
+  # Log parsed URI host and database name
+  IO.puts("Parsed URI host: #{uri.host}")
   IO.puts("Parsed database name: #{database_name}")
 
+  # Configuração do repositório (banco de dados)
   config :f1_news, F1News.Repo,
     url: database_url,
     database: database_name,
@@ -47,7 +47,7 @@ if System.get_env("MIX_ENV") == "prod" do
     ssl_opts: [
       verify: :verify_peer,
       cacerts: :public_key.cacerts_get(),
-      server_name_indication: to_charlist(URI.parse(database_url).host)
+      server_name_indication: to_charlist(uri.host || "f1-news-shy-meadow-1757-db.internal")
     ]
 
   # Log the Repo configuration
@@ -61,11 +61,14 @@ if System.get_env("MIX_ENV") == "prod" do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  # Configura o host e a porta do endpoint
   host = System.get_env("PHX_HOST") || "f1kiyoshi.fly.dev"
   port = String.to_integer(System.get_env("PORT") || "8080")
 
+  # Configuração de DNS cluster
   config :f1_news, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  # Configuração do endpoint
   config :f1_news, F1NewsWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
