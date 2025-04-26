@@ -9,10 +9,6 @@ config :f1_news,
   ecto_repos: [F1News.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-# Configures the repository
-config :f1_news, F1News.Repo,
-  adapter: Ecto.Adapters.Postgres
-
 # Configures the endpoint
 config :f1_news, F1NewsWeb.Endpoint,
   url: [host: "localhost"],
@@ -57,5 +53,5 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Import prod config for production builds
-import_config "prod.exs"
+# Import environment-specific config
+import_config "#{config_env()}.exs"
