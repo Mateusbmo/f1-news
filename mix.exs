@@ -45,7 +45,7 @@ defmodule F1News.MixProject do
       {:jason, "~> 1.4"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:castore, "~> 1.0"}, #test
+      {:castore, "~> 1.0"},
       {:bcrypt_elixir, "~> 3.2"},
       {:httpoison, "~> 2.2"}
     ]
