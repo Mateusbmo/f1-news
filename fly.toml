@@ -7,8 +7,8 @@ primary_region = "ord"
 [env]
   MIX_ENV = "prod"
   PHX_HOST = "f1kiyoshi.fly.dev"
-  PORT = "8080"
   PHX_SERVER = "true"
+  PORT = "8080"
 
 [http_service]
   auto_start_machines = true
@@ -19,5 +19,5 @@ primary_region = "ord"
   processes = ["app"]
 
 [[vm]]
-  size = "shared-cpu-1x"
   memory = "512mb"
+  size = "shared-cpu-1x"
