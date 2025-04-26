@@ -12,7 +12,7 @@ config :f1_news, F1News.Repo,
 config :f1_news, F1NewsWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   url: [host: "localhost"],
-  secret_key_base: "1aFH6ybYPdzQixkz7aT0CghlN75WDl7VyhxRX6LPP8Yu5jA2dbcwCbTr/YKBs4xO2SgDF9ACg1U06l7/l+J1ag==", # Substitua por sua chave gerada
+  secret_key_base: "1aFH6ybYPdzQixkz7aT0CghlN75WDl7VyhxRX6LPP8Yu5jA2dbcwCbTr/YKBs4xO2SgDF9ACg1U06l7/l+J1ag==",
   render_errors: [
     formats: [html: F1NewsWeb.ErrorHTML, json: F1NewsWeb.ErrorJSON],
     layout: false
