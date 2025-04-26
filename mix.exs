@@ -16,7 +16,7 @@ defmodule F1News.MixProject do
   def application do
     [
       mod: {F1News.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :castore] # Adicionado :castore
     ]
   end
 
@@ -45,7 +45,7 @@ defmodule F1News.MixProject do
       {:jason, "~> 1.4"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:castore, "~> 1.0"},
+      {:castore, "~> 1.0", override: true}, # Mantido override: true
       {:bcrypt_elixir, "~> 3.2"},
       {:httpoison, "~> 2.2"}
     ]
